@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>window.location.href的用法(动态输出跳转)</title>
+</head>
+<body>
+<div>
+
+    <h1>javascript中的location.href有很多种用法，主要如下。</h1>
+
+    <p>self.location.href = "/url"当前页面打开url页面；</p>
+    <p>location.href = "/url"当前页面打开URL页面；</p>
+    <p>windows.location.href = "/url"当前页面打开URL页面，前面三个用法相同。</p>
+
+
+    <p>this.location.href = "/url" 当前页面打开URL页面；</p>
+    <p>parent.location.href = "/url" 在父页面打开新页面；</p>
+    <p>top.location.href = "/url" 在顶层页面打开新页面；</p>
+
+
+    <span>如果页面中自定义了frame,那么可将parent self top 换为自定义frame的名称，效果是在frame窗口打开url地址</span>
+    <p>此外，window.location.href = window.location.href;和window.location.Reload()
+       都是刷新页面。区别在于是否有提交数据。当有提交数据时，window.location.Reload()会
+       提示是否提交，window.location.href = window.location.href; 则是向指定的URL提交数据</p>
+
+    <p>在写ASP.Net程序的时候，我们经常遇到跳转页面的问题，我们经常使用Response.Redirect做ASP.Net
+       框架页跳转，如果客户要在跳转的时候使用提示，这个就不灵了，如：</p>
+
+    <p>代码如下：</p>
+    <div>
+        Response.Write("< script>alert('恭喜您，注册成功！');< /script>");
+        Response.Redirect("main.html");
+    </div>
+    <p>这时候我们的提示内容没有跳出来，和Response.Redirect("main.html");没任何区别；</p>
+    <p>这是我们采用下面代码试验一下：</p>
+
+
+
+    <p>ASP.Net框架页跳转的另一实现</p>
+    <div>
+        Response.Write("< script language=javascript>alert('恭喜您，注册成功！')< /script>");
+        Response.Write("< script language=javascript>window.location.href='main.html'< /script>");
+    </div>
+
+    <p>这样就搞定了ASP.NET框架页跳转中断的问题。其实asp、php中一般都使用这种方式。</p>
+
+    <p>"window.location.href"、"location.href"是本页面跳转</p>
+    <p>"parent.location.href"是上一层页面跳转</p>
+    <p>"top.location.href"是最外层的页面跳转</p>
+
+    <h3>举例说明：</h3>
+    <p>如果A,B,C,D都是jsp，D是C的iframe，C是B的iframe，B是A的iframe，如果D中js这样写</p>
+    <div>
+        "window.location.href"、"location.href"：D页面跳转
+        "parent.location.href"：C页面跳转
+        "top.location.href"：A页面跳转
+    </div>
+
+    <p>如果D页面中有form的话,</p>
+    <div>
+        <form target="_blank">: form提交后弹出新页面
+            <form target="_parent">: form提交后C页面跳转
+                <form target="_top"> : form提交后A页面跳转
+    </div>
+
+    <p>关于页面刷新，D 页面中这样写：</p>
+    <div>
+        "parent.location.reload();": C页面刷新 （当然，也可以使用子窗口的 opener 对象来获得父窗口的对象：window.opener.document.location.reload(); ）
+
+        "top.location.reload();": A页面刷新
+    </div>
+
+
+
+
+
+</div>
+</body>
+</html>
