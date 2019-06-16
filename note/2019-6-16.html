@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>H5实现手风琴效果</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        div {
+            width: 522px;
+            height: 222px;
+            margin: 50px auto;
+            border: 1px solid red;
+            box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        ul {
+            overflow: hidden;
+            height: 222px;
+        }
+        li {
+            float: left;
+            height: 222px;
+            list-style: none;
+            box-sizing: border-box;
+        }
+        h3 {
+            width: 50px;
+            float: left;
+            height: 222px;
+            border: 1px solid green;
+            box-sizing: border-box;
+        }
+        img {
+            width: 0px;
+            float: left;
+        }
+        .img {
+            width: 220px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <ul>
+        <li><h3>1</h3><img src="images/01.jpg" alt=""/></li>
+        <li><h3>2</h3><img src="images/02.jpg" alt=""/></li>
+        <li><h3>3</h3><img src="images/03.jpg" alt=""/></li>
+        <li><h3>4</h3><img src="images/04.jpg" alt=""/></li>
+        <li><h3>5</h3><img src="images/01.jpg" alt=""/></li>
+        <li><h3>6</h3><img class="img" src="images/02.jpg" alt=""/></li>
+    </ul>
+</div>
+
+<script>
+    var lis = document.querySelectorAll("li");
+    var imgs = document.querySelectorAll("img");
+    for(var i = 0; i < lis.length; i++) {
+        //给所有的li标签添加点击事件
+        lis[i].onclick = function () {
+            //将所有的图片宽度设置为0
+            for(var i = 0; i < lis.length; i++) {
+                imgs[i].style.width = "0px";
+            }
+            //将当前点击li标签中的img标签设置宽度为220px
+            this.querySelector("img").style.width = "220px";
+        }
+    }
+</script>
+</body>
+</html>
