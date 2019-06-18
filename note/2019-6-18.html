@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用 Electron 开发桌面效率工具</title>
+</head>
+<body>
+ <h1>托盘和托盘弹窗</h1>
+<P>这个 app 启动的时候就隐藏在托盘菜单的一角，点击的时候显示 BrowserWindow，通过 Electron 提供的方法，可以获得托盘和托盘弹窗的 Bounds 信息，设置坐标位置。</P>
+ <script>
+     const
+         tray
+             =
+
+             new
+
+             Tray
+             (
+                 path
+                     .
+                     join
+                     (
+                         __dirname
+                         ,
+
+                         '../static'
+                         ,
+
+                         'tray.png'
+                     ));
+
+     const
+         mainWindow
+             =
+
+             new
+
+             BrowserWindow
+             ({
+
+                 frame
+                     :
+
+                     false
+                 ,
+                 resizable
+                     :
+
+                     true
+                 ,
+                 transparent
+                     :
+
+                     true
+             });
+
+     const
+         showWindow
+             =
+
+             ()
+
+                 =>
+
+             {
+
+                 const
+
+                     {
+                         x
+                         ,
+                         y
+                     }
+
+                         =
+                         getPositionFromActiveDisplay
+                         ();
+                 mainWindow
+                     .
+                     setPosition
+                     (
+                         x
+                         ,
+                         y
+                         ,
+
+                         true
+                     );
+                 mainWindow
+                     .
+                     show
+                     ();
+             };
+
+     const
+         getPositionFromActiveDisplay
+             =
+
+             ()
+
+                 =>
+
+             {
+
+                 const
+                     trayBounds
+                         =
+                         tray
+                             .
+                             getBounds
+                             ();
+
+                 const
+                     windowBounds
+                         =
+                         mainWindow
+                             .
+                             getBounds
+                             ();
+
+
+                 const
+                     x
+                         =
+
+                         Math
+                             .
+                             round
+                             (
+                                 trayBounds
+                                     .
+                                     x
+                                 +
+                                 trayBounds
+                                     .
+                                     width
+                                 /
+
+                                 2
+
+                                 -
+                                 windowBounds
+                                     .
+                                     width
+                                 /
+
+                                 2
+                             );
+
+                 const
+                     y
+                         =
+
+                         Math
+                             .
+                             round
+                             (
+                                 trayBounds
+                                     .
+                                     y
+                                 +
+                                 trayBounds
+                                     .
+                                     height
+                             );
+
+
+                 return
+
+                 {
+                     x
+                         ,
+                         y
+                 };
+             };
+ </script>
+</body>
+</html>
