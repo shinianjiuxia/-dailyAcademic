@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>全面了解Cookie</title>
+</head>
+<body>
+ <div>
+     <h1>一、Cookie的出现</h1>
+     <p>浏览器和服务器之间的通信少不了HTTP协议，但是因为HTTP协议是无状态的，</p>
+     <p>所以服务器并不知道上一次浏览器做了什么样的操作，这样严重阻碍了交互式Web应用程序的实现。</p>
+     <p>这样严重阻碍了交互式Web应用程序的实现。</p>
+     <p>针对上述的问题，网景公司的程序员创造了Cookie。</p>
+
+     <h1>二、Cookie的传输</h1>
+     <p>服务器端在实现Cookie标准的过程中，需要对任意HTTP请求发送Set-Cookie HTTP头作为响应的一部分：</p>
+     <script>
+         Set-Cookie: name=value; expires=Tue, 03-Sep-2019 14:10:21 GMT; path=/; domain=.xxx.com;
+     </script>
+     <p>浏览器端会存储这样的Cookie，并且为之后的每个请求添加Cookie HTTP请求头发送回服务器：</p>
+     <script>
+         Cookie: name=value
+     </script>
+     <p>服务器通过验证Cookie值，来判断浏览器发送请求属于哪一个用户。</p>
+     <p>浏览器中的Cookie主要由以下几部分组成：</p>
+       <span>名称：Cookie唯一的名称，必须经过URL编码处理。（同名会出现覆盖的情况）</span>
+       <span>值：必须经过URL编码处理。</span>
+       <span>域（domain）：默认情况下cookie在当前域下有效，你也可以设置该值来确保对其子域是否有效。</span>
+       <span>路径（path）：指定Cookie在哪些路径下有效，默认是当前路径下。</span>
+       <span>失效时间（expires）：默认情况下，浏览器会话结束时会自动删除Cookie；也可以设置一个GMT格式的日期，指定具体的删除日期；如果设置的日期为以前的日期，那么Cookie会立即删除。</span>
+       <span>安全标志（secure）：指定之后只允许Cookie发送给https协议。</span>
+     <p>浏览器在发送请求时，只会将名称与值添加到请求头的Cookie字段中，发送给服务端。</p>
+     <p>浏览器提供了一个非常蹩脚的API来操作Cookie：</p>
+     <script>
+         document.cookie
+     </script>
+     <p>通过上述方法可以对该Cookie进行写操作，每一次只能写入一条Cookie字符串：</p>
+     <script>
+         document.cookie = 'a=1; secure; path=/'
+     </script>
+     <p>通过该方法还可以进行Cookie的读操作：</p>
+     <script>
+         document.cookie
+         // "a=1"
+     </script>
+     <p>由于上述方法操作Cookie非常的不直观，一般都会写一些函数来简化Cookie读取、设置和删除操作。</p>
+     <p>对于Cookie的设置操作中，需要以下几点：</p>
+     <p>对于名称和值进行URL编码处理，也就是采用JavaScript中的encodeURIComponent()方法； expires要求传入GMT格式的日期，需要处理为更易书写的方式，比如：设置秒数的方式； 注意只有的属性名的secure；</p>
+     <p>每一段信息需要采用分号加空格</p>
+     <script>
+         function setCookie (key, value, attributes) {
+             if (typeof document === 'undefined') {
+                 return
+             }
+             attributes = Object.assign({}, {
+                 path: '/'
+             }, attributes)
+
+             let { domain, path, expires, secure } = attributes
+
+             if (typeof expires === 'number') {
+                 expires = new Date(Date.now() + expires * 1000)
+             }
+             if (expires instanceof Date) {
+                 expires = expires.toUTCString()
+             } else {
+                 expires = ''
+             }
+
+             key = encodeURIComponent(key)
+
+             value = encodeURIComponent(value)
+
+             let cookieStr = `${key}=${value}`
+
+             if (domain) {
+                 cookieStr += `; domain=${domain}`
+             }
+
+             if (path) {
+                 cookieStr += `; path=${path}`
+             }
+
+             if (expires) {
+                 cookieStr += `; expires=${expires}`
+             }
+
+             if (secure) {
+                 cookieStr += `; secure`
+             }
+
+             return (document.cookie = cookieStr)
+         }
+     </script>
+     <p>Cookie的读操作需要注意的是将名称与值进行URL解码处理，也就是调用JavaScript中的decodeURIComponent()方法：</p>
+     <script>
+         function getCookie (name) {
+             if (typeof document === 'undefined') {
+                 return
+             }
+             let cookies = []
+             let jar = {}
+             document.cookie && (cookies = document.cookie.split('; '))
+
+             for (let i = 0, max = cookies.length; i < max; i++) {
+                 let [key, value] = cookies[i].split('=')
+                 key = decodeURIComponent(key)
+                 value = decodeURIComponent(value)
+                 jar[key] = value
+                 if (key === name) {
+                     break
+                 }
+             }
+
+             return name ? jar[name] : jar
+         }
+     </script>
+     <p>最后一个清除的方法就更加简单了，只要将失效日期（expires）设置为过去的日期即可：</p>
+     <script>
+         function removeCookie (key) {
+             setCookie(key, '', { expires: -1 })
+         }
+     </script>
+     <p>介绍Cookie基本操作的封装之后，还需要了解浏览器为了限制Cookie不会被恶意使用，</p>
+     <p>规定了Cookie所占磁盘空间的大小以及每个域名下Cookie的个数。</p>
+     <p>为了绕开单域名下Cookie个数的限制，开发人员还创造了一种称为subcookie的概念，这里就不在赘述了，可以参考【JavaScript高级程序设计第23章 p633】。</p>
+
+     <h1>四、服务端的Cookie</h1>
+     <p>相比较浏览器端，服务端执行Cookie的写操作时，是将拼接好的Cookie字符串放入响应头的Set-Cookie字段中；执行Cookie的读操作时，则是解析HTTP请求头字段Cookie中的键值对。</p>
+     <p>与浏览器最大的不同，在于服务端对于Cookie的安全性操碎了心 signed</p>
+     <p>当设置signed=true时，服务端会对该条Cookie字符串生成两个Set-Cookie响应头字段：</p>
+     <script>
+         Set-Cookie: lastTime=2019-03-05T14:31:05.543Z; path=/; httponly
+         Set-Cookie: lastTime.sig=URXREOYTtMnGm0b7qCYFJ2Db400; path=/; httponly
+     </script>
+     <p>
+         这里通过再发送一条以.sig为后缀的名称以及对值进行加密的Cookie，来验证该条Cookie是否在传输的过程中被篡改。
+     </p>
+     <p>httpOnly</p>
+     <p>服务端Set-Cookie字段中新增httpOnly属性，当服务端在返回的Cookie信息中含有httpOnly字段时，开发者是不能通过JavaScript来操纵该条Cookie字符串的。</p>
+     <p>这样做的好处主要在于面对XSS（Cross-site scripting）攻击时，黑客无法拿到设置httpOnly字段的Cookie信息。</p>
+     <p>此时，你会发现localStorage相比较Cookie，在XSS攻击的防御上就略逊一筹了。 sameSite</p>
+     <p>在介绍这个新属性之前，首先你需要明白：当用户从http://a.com发起http://b.com的请求也会携带上Cookie，而从http://a.com携带过来的Cookie称为第三方Cookie。</p>
+     <p>虽然第三方Cookie有一些好处，但是给CSRF（Cross-site request forgrey）攻击的机会。</p>
+     <p>为了从根源上解决CSRF攻击，sameSite属性便闪亮登场了，它的取值有以下几种：</p>
+     <p>strict：浏览器在任何跨域请求中都不会携带Cookie，这样可以有效的防御CSRF攻击，但是对于有多个子域名的网站采用主域名存储用户登录信息的场景，每个子域名都需要用户重新登录，造成用户体验非常的差。</p>
+     <p>lax：相比较strict，它允许从三方网站跳转过来的时候使用Cookie。</p>
+     <p>为了方便大家理解sameSite的实际效果，可以看这个例子：</p>
+     <script>
+         // a.com 服务端会在访问页面时返回如下Cookie
+
+         cookies.set('foo', 'aaaaa')
+         cookies.set('bar', 'bbbbb')
+         cookies.set('name', 'cccccc')
+
+         // b.com 服务端会在访问页面时返回如下Cookie
+         cookies.set('foo', 'a', { sameSite: 'strict' })
+         cookies.set('bar', 'b', { sameSite: 'lax' })
+         cookies.set('baz', 'c')
+     </script>
+     <p>如何现在用户在a.com中点击链接跳转到b.com，它的请求头是这样的：</p>
+     <script>
+         Request Headers
+         Cookie: bar=b; baz=
+     </script>
+
+     <h1>五、网站性能优化</h1>
+     <p>Cookie在服务端和浏览器的通信中，主要依靠HTTP的响应头和请求头传输的，所以Cookie会占据一定的带宽。</p>
+     <p>前面提到浏览器会为每一次HTPP请求自动携带上Cookie信息，但是对于同站内的静态资源，服务器并不需要处理其携带的Cookie，这无形中便浪费了带宽。</p>
+     <p>在最佳实践中，一般都会将静态资源部署到独立的域名上，从而可以避免无效Cookie的影响。</p>
+ </div>
+</body>
+</html>
