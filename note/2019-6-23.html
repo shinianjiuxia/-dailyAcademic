@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>移动web图片高度自适应的解决方案</title>
+</head>
+<body>
+<div>
+    <p>由于图片的加载是在dom加载完之后进行的，于是，在手机端浏览网页时，经常会看到页面刚
+    打开的时候很多内容叠在一起，当图片加载完成后，页面会由于图片加载完成出现明显的抖动</p>
+    <h1>针对这个问题，有以下几种解决方案</h1>
+    <h2>媒体查询+px</h2>
+    <h2>rem</h2>
+    <h2>vm</h2>
+    <h2>padding</h2>
+    <h1>媒体查询+PX</h1>
+    <script>
+        @media screen and(max - width: 320 px) {
+            img {
+                height: 50px;
+            }
+        }
+    </script>
+    <p>移动端设备种类繁多。媒体查询固然精准，但相应的工作量的增加</p>
+
+    <h1>rem</h1>
+    <p>rem这个低调的单位随着WEBAPP的兴起，俨然成为手机端屏幕适配的最佳方案</p>
+    <script>
+        img{
+            height：0.5rem;
+        }
+    </script>
+    <p>但由于rem的小数像素问题，可能会导致1PX偏差的产生，就看你是不是处女座了</p>
+
+    <h1>vm</h1>
+    <P>相对于视口的宽度或高度中较小的那个，其中最小的那个被均分为100单位的VM，
+       算是比较完美的一个解决方案了，不过iOS8以下及android4.4以下不支持</P>
+
+    <h1>padding</h1>
+    <p>padding是可以百分比取值的，详见padding-properties（https://www.w3.org/TR/CSS2/box.html#padding-properties）</p>
+    <p>即取值为百分比时，计算出来的PADDING边距是相对于其父元素的宽度计算的（margin雷同），如下图：
+        那么，解决图片占位的问题就很简单了。</p>
+    <h2>页面布局如下：</h2>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        ul {
+            overflow: hidden;
+        }
+        li {
+            width: 50%;
+            float: left;
+            text-align: center;
+        }
+        img {
+            width: 100%
+        }
+    </style>
+    <ul>
+        <li>
+            <div class="cover">
+                <img src="2222.png" alt="">
+            </div>
+            <div>
+                文字
+            </div>
+        </li>
+    </ul>
+    <p>这里使用伪元素替代DIV充当子元素，由于padding-top使图片距离cover顶部100%，用相对定位到顶端</p>
+    <style>
+        .cover {
+            position: relative;
+            font-size: 0;
+            display: inline-block;
+            width: 100%
+        }
+        .cover img {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .cover:after {
+            content: '\20';
+            padding-top: 100%;
+            display: block;
+        }
+    </style>
+</div>
+</body>
+</html>
