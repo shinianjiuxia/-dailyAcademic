@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>原生JavaScript实现截取视频第一帧作为图片</title>
+</head>
+<body>
+<div>
+    <h1>新建一个 video ，放置需要截取的视频文件</h1>
+    <eg>
+        <video id="video" controls="controls" src="video/1.mp4"></video>
+    </eg>
+    <p>在 JS 中获取video标签,并监听它的 loadeddata 事件：</p>
+    <p>loadeddata : 当媒体当前播放位置的帧完成加载时触发该事件; 通常是第一帧。</p>
+    <script>
+        video = document.getElementById("video");
+        video.addEventListener('loadeddata', function() { });
+    </script>
+   <h1>第二步</h1>
+    <p>在监听 loadeddata 中 指定事件触发时执行的函数。我们的实现截取第一帧就在这里面编写。</p>
+    <p>1，定义创建一个 canvas 标签;</p>
+    <p>2，指定 canvas 标签的宽高;</p>
+    <p>3, 调用canvas元素中的 getContext() 方法（返回一个用于在画布上绘图的环境）。</p>
+    <script>
+        let canvas = document.createElement("canvas")
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+        let ctx = canvas.getContext('2d')
+    </script>
+    <p>此时我们已经拥有了一个有着固定宽高并且有一个用于在画布上绘图的环境。</p>
+    <p>之后调用ctx （画布的2d绘图的环境）中的 drawImage 方法</p>
+    <p>来在画布上定位图像，并规定图像的宽度和高度：</p>
+    <p>ctx.drawImage(img,x,y,width,height)</p>
+    <P>img 规定要使用的图像、画布或视频。</P>
+    <P>x 在画布上放置图像的 x 坐标位置。</P>
+    <P>y 在画布上放置图像的 y 坐标位置。</P>
+    <p>width 可选。要使用的图像的宽度。（伸展或缩小图像）</p>
+    <p>height 可选。要使用的图像的高度。（伸展或缩小图像）</p>
+    <P>此时此刻我们的canvas中已经有图像了，若</P>
+    <P>想看效果，将 canvas 插入到 body 即可。</P>
+    <SCRIPT>
+        document.body.appendChild(canvas)
+    </SCRIPT>
+    <P>不过我们要的是插入到 img 标签中，所以还需要调用一个api !</P>
+    <H1>第三步</H1>
+    <P>1, 定义创建一个img</P>
+    <P>2, 调用 canvas 中的 toDataURL 方法:</P>
+    <P>HTMLCanvasElement.toDataURL() 方法返回一个包含图片展示的 data URI 。</P>
+    <P>可以使用 type参数其类型，默认为 PNG 格式。图片的分辨率为96dpi。</P>
+    <P>语法：</P>
+    <P>canvas.toDataURL(type, encoderOptions);</P>
+    <P>type图片格式，默认为 image/png</P>
+    <P>encoderOptions 图片质量；</P>
+    <P>；在指定图片格式为 image/jpeg 或 image/webp的情况下，</P>
+    <P>可以从 0 到 1 的区间内选择图片的质量。</P>
+    <P>如果超出取值范围，将会使用默认值 0.92。其他参数会被忽略。</P>
+    <script>
+        let img = document.createElement("img")
+        img.src = canvas.toDataURL("image/png")
+        document.body.appendChild(img)
+    </script>
+
+    <h1>完整代码</h1>
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>截取demo</title>
+    </head>
+    <body>
+    <video id="video" controls="controls" src="video/1.mp4" width="360" height="640"></video>
+    <script type="text/javascript">
+        (function() {
+
+            let captureImage = function() {
+                let canvas = document.createElement("canvas")
+                canvas.width = 360
+                canvas.height = 640
+                let ctx = canvas.getContext('2d')
+                ctx.drawImage(video, 0, 0, 360, 640)
+                // document.body.appendChild(canvas)
+                let img = document.createElement("img")
+                img.src = canvas.toDataURL("image/png")
+                document.body.appendChild(img)
+            }
+
+            let video = document.getElementById("video")
+            video.addEventListener('loadeddata', captureImage)
+        })()
+    </script>
+    </body>
+    </html>
+</div>
+</body>
+</html>
