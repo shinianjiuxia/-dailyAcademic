@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>javascript 应用技巧</title>
+</head>
+<body>
+<div>
+    /***                              _
+    *  _._ _..._ .-',     _.._(`))
+    * '-. `     '  /-._.-'    ',/
+    *    )         \            '.
+    *   / _    _    |             \
+    *  |  a    a    /              |
+    *  \   .-.                     ;
+    *   '-('' ).-'       ,'       ;
+    *      '-;           |      .'
+    *         \           \    /
+    *         | 7  .__  _.-\   \
+    *         | |  |  ``/  /`  /
+    *        /,_|  |   /,_/   /
+    *           /,_/      '`-'
+    */
+
+
+    /***
+    *                    .::::.
+    *                  .::::::::.
+    *                 :::::::::::  FUCK YOU
+    *             ..:::::::::::'
+    *           '::::::::::::'
+    *             .::::::::::
+    *        '::::::::::::::..
+    *             ..::::::::::::.
+    *           ``::::::::::::::::
+    *            ::::``:::::::::'        .:::.
+    *           ::::'   ':::::'       .::::::::.
+    *         .::::'      ::::     .:::::::'::::.
+    *        .:::'       :::::  .:::::::::' ':::::.
+    *       .::'        :::::.:::::::::'      ':::::.
+    *      .::'         ::::::::::::::'         ``::::.
+    *  ...:::           ::::::::::::'              ``::.
+    * ```` ':.          ':::::::::'                  ::::..
+    *                    '.:::::'                    ':'````..
+    */
+  <h1>转化为Boolean类型</h1>
+    <h2>所有JavaScript中的值都能隐式的转化为Boolean类型，比如：</h2>
+    <script>
+        0 == false ; //true
+        1 == true ; //true
+        ''== false //true
+        null == false //false
+    </script>
+    <h2>但是这些值都不是Boolean类型。</h2>
+
+    <h2>因此当我们使用三个等于号进行比较时：</h2>
+    <script>
+        0 === false; // false
+        1 === true; // false
+        '' === false // false
+        null === false // true
+    </script>
+
+    <h2>现在的问题是如何将其他类型转化为Boolean类型：</h2>
+    <script>
+        !!0 === false; // true
+        !!1 === true; // true
+        !!'' === false // true
+        !!null === false // false
+
+
+        1 ""           ==   "0"           // false
+        2 0            ==   ""            // true
+        3 0            ==   "0"           // true
+        4 false        ==   "false"       // false
+        5 false        ==   "0"           // true
+        6 false        ==   undefined     // false
+        7 false        ==   null          // false
+        8 null         ==   undefined     // true
+        9 " \t\r\n"    ==   0             // true
+
+    </script>
+
+    <h1>为参数赋初值</h1>
+    <h2>JavaScript中没有重载的概念，但是JavaScript中函数的参数都是可选的，如果调用时少写了一个参数，将会被undefined所代替。</h2>
+    <script>
+        function plus(base, added) {
+            return base + added;
+        }
+        plus(2); // NaN
+    </script>
+    <h2>在这个例子中，plus(2)和plus(2, undefined)是等价的</h2>
+    <h2>2 + undefined的结果是NaN。 </h2>
+    <h2>现在的问题是，如果没有传递第二个参数，如何为它赋初值呢？</h2>
+    <script>
+        function plus(base, added) {
+            added = added || 1;
+            return base + added;
+        }
+        plus(2); // 3
+        plus(2, 2); // 4
+    </script>
+    <h2>有网友提到 plus(2, 0) = 3; 的确是这样的，看来这个地方还要做一些特殊处理：</h2>
+    <script>
+        function plus(base, added) {
+            added = added || (added === 0 ? 0 : 1);
+            return base + added;
+        }
+    </script>
+
+    <h1>阻止别人在Iframe中加载你的页面</h1>
+    <h2>如果你的网站变得非常有人气的时候，就有很多网站想链接到你的网站，甚至想把你的网页通过IFrame嵌入它自己的网页。 </h2>
+    <H2>这样就不好玩了，那么如何来阻止这样行为呢？</H2>
+    if(top ! == window){
+
+      top.location.href = window.location.href;
+    }
+    <p>这段代码应该放在你每个页面的head中，如果你想知道现实中有没人在用，看看baidu的博客你就知道了。 </p>
+
+    <h1>字符串替换</h1>
+    <h2>String.prototype.replace函数经常会让那些非常熟悉C#或者Java的程序员感到迷惑。
+        比如：</h2>
+    <script>
+        'Hello world, hello world'.replace('world', 'JavaScript');
+        // The result is "Hello JavaScript, hello world"
+    </script>
+    <h2>replace函数的第一个参数是正则表达式</h2>
+    <h2>如果你传递一个字符串到第一个参数，则只有第一个找到的匹配字符串被替换</h2>
+    <h2>为了解决这个问题，我们可以使用正则表达式：</h2>
+    <script>
+        'Hello world, hello world'.replace(/world/g, 'JavaScript');
+        // The result is "Hello JavaScript, hello JavaScript"
+    </script>
+    <p>我们还可以指定在替换时忽略大小写：</p>
+    <script>
+        'Hello world, hello world'.replace(/hello/gi, 'Hi');
+        // The result is "Hi world, Hi world"
+
+    </script>
+
+    <h1>将arguments转化为数组</h1>
+    <h2>函数中的预定义变量arguments并非一个真正的数组，而是一个类似数组的对象。 </h2>
+    <h2>它具有length属性，但是没有slice, push, sort等函数，那么如何使arguments具有这些数组才有的函数呢？ </h2>
+    <h2>也就是说如何使arguments变成一个真正的数组呢？</h2>
+    <script>
+        function args(){
+            return[].slice.call(arguments,0);
+        }
+
+        args(2,5,8);// [2, 5, 8]
+    </script>
+
+    <h1>为parseInt函数指定第二个参数</h1>
+    <h2>parseInt用来将字符串转化为整形的数字，语法为：</h2>
+    <script>
+        parseInt(str, [radix])
+    </script>
+    <h2>其中第二个参数是可选的，用来指定第一个参数是几进制的。 </h2>
+    <h2>如果没有传递第二个参数，则按照如下规则：</h2>
+    <h2>->如果str以 0x 开头，则认为是16进制。</h2>
+    <h2>->如果str以 0 开头，则认为是8进制。</h2>
+    <h2>->否则，认为是10进制。</h2>
+    <h2>因此如下的代码将会让人很迷惑，如果你不知道这些规则：</h2>
+    <script>
+        parseInt('08'); // 0
+        parseInt('08', 10); // 8
+    </script>
+    <h2>所以，安全起见一定要为parseInt指定第二个参数。 </h2>
+
+
+    <h1>从数组中删除一个元素 </h1>
+    <h2>或许我们可以通过delete来做到：</h2>
+    <scrript>
+        var arr = [1, 2, 3, 4, 5];
+        delete arr[1];
+        arr; // [1, undefined, 3, 4, 5]
+    </scrript>
+    <p>可以看到，delete并不能真正的删除数组中的一个元素。删除的元素会被undefined取代，数组的长度并没有变化。 </p>
+    <p>事实上，我们可以通过Array.prototype中的splice函数来删除数组中的元素，如下所示：
+    </p>
+    <script>
+        var arr = [1, 2, 3, 4, 5];
+        arr.splice(1, 1);
+        arr; // [1, 3, 4, 5]
+
+    </script>
+
+
+    <h1>函数也是对象</h1>
+    <p>在JavaScript中函数也是对象，因为我们可以为函数添加属性。
+        比如：</p>
+    <script>
+        function add(){
+            return add.count++;
+        }
+        add.count = 0;
+        add();    // 0
+        add();    // 1
+        add();    // 2
+    </script>
+    <h2>我们为函数add添加了count属性，用来记录此函数被调用的次数。 </h2>
+    <h2>当然这可以通过更优雅的方式来实现：</h2>
+    <script>
+        function add(){
+            if(!arguments.callee.count){
+                arguments.callee.count = 0;
+            }
+            return arguments.callee.count++;
+        }
+        add();    // 0
+        add();    // 1
+        add();    // 2
+    </script>
+    <h2>arguments.callee指向当前正在运行的函数。 </h2>
+
+
+    <h1>数组中的最大值</h1>
+    <h2>如何在全是数字的数组中找到最大值，我们可以简单的通过循环来完成：</h2>
+    <script>
+        var arr = [2,3,45,12,8];
+        var max = arr[0];
+        for(var i in arr){
+            if (arr[i]>max){
+                max = arr[i];
+            }
+        }
+        max; // 45
+    </script>
+    <p>有没有其他方法？我们都知道JavaScript中有一个Math对象进行数字的处理：</p>
+    <script>
+        Math.max(2, 3, 45, 12, 8); // 45
+    </script>
+    <p>然后，我们可以这样来找到数组中最大值：</p>
+    <script>
+        var arr = [2, 3, 45, 12, 8];
+        Math.max.apply(null, arr); // 45
+    </script>
+
+    <h1>为IE添加console.log函数 </h1>
+    <h2>在Firefox下并有Firebug的支持下，我们经常使用console.log来在控制台记录一些信息。 </h2>
+    <h2>但是这种做法在IE下会阻止JavaScript的执行（在Firefox下没有启用Firebug情况下也是一样），</h2>
+    <h2>因为此时根本没有console对象存在。</h2>
+    <h2>我们可以通过如下小技巧来防止这样情况的发生：</h2>
+    <script>
+        if (typeof(console) === 'undefined') {
+            window.console = {
+                log: function(msg) {
+                    alert(msg);
+                }
+            };
+        }
+        console.log('debug info.');
+    </script>
+
+
+    <h1>undefined是JavaScript中保留关键字么？</h1>
+    <h2>看起来像是的，但实际上undefined并不是JavaScript中的关键字:</h2>
+    <script>
+        var undefined = 'Hello';
+        undefined; // 'Hello'
+    </script>
+    <h2>这段代码可能会让你感到很奇怪，不过它的确能够正常运行，undefined只是JavaScript中一个预定义的变量而已。</h2>
+    <h2>注：在JavaScript程序中，千万不要这样做，这个技巧只是告诉你有这么一回事而已。 </h2>
+
+
+    <h1>判断一个变量是否为undefined</h1>
+    <h2>两种情况下，一个变量为undefined： </h2>
+    <h2>1. 声明了变量，但是没有赋值</h2>
+    <script>
+        var name;
+        name === undefined; // true
+    </script>
+    <h2>2. 从来没有声明过此变量</h2>
+    <script>
+        name2 === undefined; // error – name2 is not defined
+    </script>
+    <p>在第二种情况下，会有一个错误被抛出，那么如果判断一个变量是否为undefined而不产生错误呢？ </p>
+    <p>下面提供了一种通用的方法：</p>
+    <script>
+        typeof(name2) === ‘undefined’; // true
+    </script>
+
+    <h1>预加载图片 </h1>
+    <h2>预加载图片就是加载页面上不存在的图片，以便以后使用JavaScript把它们快速显示出来。</h2>
+    <h2>比如你想在鼠标移动到某个图片上时显示另一张图片:</h2>
+    <script>
+        var img = new Image();
+        img.src = "clock2.gif";
+
+        <img src="clock.gif" mce_src="clock.gif" alt=""
+        onmouseover="this.src='clock2.gif';"
+        onmouseout="this.src=clock.gif';" />
+    </script>
+    <h2>那么，如何加载一组图片呢？考虑如下代码：</h2>
+    <script>
+        var source = ['img1.gif','img2.gif'];
+        var img = new Image();
+        for(var i = 0; i < source.length; i++) {
+            img.src = source[i];
+        }
+    </script>
+    <h2>实际上，这段代码只能预加载最后的一张图片，因为其他的图片根本没有时间来预加载在循环到来的时候。</h2>
+    <h2>因此正确的写法应该是：</h2>
+    <script>
+        var source = ['img1.gif','img2.gif'];
+        for(var i = 0; i < source.length; i++) {
+            var img = new Image();
+            img.src = source[i];
+        }
+
+    </script>
+
+
+    <h1>闭包（closure）</h1>
+    <h2>闭包指的是函数内的局部变量，当函数返回时此变量依然可用。 </h2>
+    <h2>当你在函数内部定义另外一个函数时，你就创建了一个闭包，一个著名的例子： </h2>
+    <script>
+        function add(i) {
+            return function() {
+                return ++i;
+            };
+        }
+        add(2).toString(); // "function () { return ++i; }"
+        add(2)(); // 3
+    </script>
+    <h2>add(2)是一个函数，它可能获取外部函数的局部变量i。 </h2>
+
+    <h1>私有变量</h1>
+    <h2>我们经常使用命名规范来标示一个变量是否为私有变量（最常用来标示）：</h2>
+    <script>
+        var person = {
+            _name: '',
+            getName: function() {
+                return this._name || 'not defined';
+            }
+        };
+        person.getName(); // "not defined"
+    </script>
+    <h2>下划线前缀用来作为私有变量的约定，但是其他开发人员仍然可以调用此私有变量：</h2>
+    <script>
+        person._name; // ""
+    </script>
+    <h2>那么，如何在JavaScript中创建一个真正的私有变量呢？ </h2>
+    <h2>主要技巧是使用匿名函数（anonymous function）和闭包（closure）。</h2>
+    <script>
+        var person = {};
+        (function() {
+        var _name = '';
+        person.getName = function() {
+        return _name || 'not defined';
+        }
+        })();
+
+        person.getName(); // "not defined"
+        typeof(person._name); // "undefined"
+    </script>
+
+
+    <h1>JavaScript没有块级上下文（Scope）</h1>
+    <h2>JavaScript中块级代码没有上下文，实际上只有函数有自己的上下文。</h2>
+    <script>
+        for(var i = 0; i < 2; i ++) {
+
+        }
+        i;  // 2
+    </script>
+    <h2>如果想创建一个上下文，可以使用自执行的匿名函数：</h2>
+    <script>
+        (function (){
+            for(var i = 0; i < 2; i ++) {
+
+            }
+        })();
+        typeof(i) === 'undefined';  // true
+    </script>
+
+    <h1>怪异的NaN</h1>
+    <h2>NaN用来表示一个值不是数字。</h2>
+    <h2>NaN在JavaScript中行为很怪异，是因为那NaN和任何值都不相等（包括它自己）。</h2>
+    <script>
+        NaN === NaN; // false
+    </script>
+    <h2>因为下面的代码可能会让一些人抓狂：</h2>
+
+    <script>
+        parseInt('hello', 10); // NaN
+        parseInt('hello', 10) == NaN; // false
+        parseInt('hello', 10) === NaN; // false
+    </script>
+
+    <h2>那么如何来检查一个值是否NaN?</h2>
+    <h2>可以使用window.isNaN来判断：</h2>
+    <script>
+        isNaN(parseInt('hello', 10)); // true
+
+    </script>
+
+    <h1>真值和假值</h1>
+    <h2>JavaScript中所有值都能隐式地转化为Boolean类型。</h2>
+    <h2>在条件判断中，下面这些值会自动转化为false：</h2>
+    <h2>因此，不需要做如下复杂的判断:</h2>
+    <script>
+        if(obj === undefined || obj === null) {
+        }
+
+    </script>
+    <h2>而只需要这样做就行了：</h2>
+    <script>
+        if(!obj) {
+
+        }
+    </script>
+
+
+    <h1>修改arguments</h1>
+    <h2>比如，添加一个值到arguments中：</h2>
+    <script>
+        function add() {
+            arguments.push('new value');
+        }
+        add(); // error - arguments.push is not a function
+    </script>
+    <h2>这样会出错，因为arguments不是一个真正的数组，没有push方法。 </h2>
+    <h2>解决办法：</h2>
+    <script>
+        function add() {
+            Array.prototype.push.call(arguments, 'new value');
+            return arguments;
+        }
+        add()[0]; // "new value"
+    </script>
+
+    <h1>Boolean 和 new Boolean</h1>
+    <h2>我们可以把Boolean看做是一个函数，用来产生Boolean类型的值（Literal）：</h2>
+    <script>
+        Boolean(false) === false; // true
+        Boolean('') === false; // true
+    </script>
+
+    <h2>所以，Boolean(0)和!!0是等价的。 </h2>
+
+    <h2>我们也可以把Boolean看做是一个构造函数，通过new来创建一个Boolean类型的对象：</h2>
+    <script>
+        new Boolean(false) === false; // false
+        new Boolean(false) == false; // true
+        typeof(new Boolean(false)); // "object"
+        typeof(Boolean(false)); // "boolean"
+    </script>
+
+    <h1>快速字符串连接</h1>
+    <h2>我们经常使用+将较短的字符串连接为一个长字符串，这在大部分的情况下是没问题的。</h2>
+    <h2>但是如果有大量的字符串需要连接，这种做法将会遇到性能问题，尤其是在IE下。 </h2>
+    <script>
+        var startTime = new Date();
+        var str = '';
+        for (var i = 0; i < 50000; i++) {
+            str += i;
+        }
+        alert(new Date() - startTime);  // Firefox - 18ms, IE7 - 2060ms
+
+        var startTime = new Date();
+        var arr = [];
+        for (var i = 0; i < 100000; i++) {
+            arr.push(i);
+        }
+        var str = arr.join("");
+        alert(new Date() - startTime); // Firefox - 38ms, IE7 - 280ms
+
+    </script>
+
+    <h1>0.1+0.2 != 0.3</h1>
+    <h2>JavaScript将小数作为浮点数对待，所以可能会产生一些四舍五入的错误，比如：</h2>
+    <script>
+        0.1 + 0.2; // 0.30000000000000004
+
+    </script>
+    <h2>你可以通过toFixed方法指定四舍五入的小数位数：</h2>
+    <script>
+        (0.1 + 0.2).toFixed(); // "0"
+        (0.1 + 0.2).toFixed(1); // "0.3"
+    </script>
+</div>
+</body>
+</html>
